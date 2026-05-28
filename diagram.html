@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>업무 프로세스 — 김비서</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ── CSS 변수 (라이트) ── */
+    :root {
+      --glass-bg:      rgba(255,255,255,0.58);
+      --glass-border:  rgba(255,255,255,0.75);
+      --glass-shadow:  0 8px 32px rgba(100,116,139,.13);
+      --text-1: #1e293b;
+      --text-2: #475569;
+      --text-3: #94a3b8;
+      --accent: #6366f1;
+      --surface: rgba(255,255,255,0.45);
+      --surface-border: rgba(100,116,139,.15);
+      --surface-hover:  rgba(255,255,255,0.65);
+      --header-bg:     rgba(255,255,255,0.72);
+      --header-border: rgba(255,255,255,0.6);
+      --badge-bg:      rgba(99,102,241,.1);
+      --badge-border:  rgba(99,102,241,.25);
+      --toggle-bg:     rgba(255,255,255,0.7);
+      --toggle-border: rgba(255,255,255,0.85);
+      --step-bg:       rgba(255,255,255,0.52);
+      --divider:       rgba(100,116,139,.1);
+    }
+
+    [data-theme="dark"] {
+      --glass-bg:      rgba(30,27,75,0.55);
+      --glass-border:  rgba(99,102,241,0.18);
+      --glass-shadow:  0 8px 32px rgba(0,0,0,.35);
+      --text-1: #e2e8f0;
+      --text-2: #94a3b8;
+      --text-3: #64748b;
+      --accent: #818cf8;
+      --surface: rgba(99,102,241,0.08);
+      --surface-border: rgba(99,102,241,0.15);
+      --surface-hover:  rgba(99,102,241,0.13);
+      --header-bg:     rgba(15,15,35,0.72);
+      --header-border: rgba(99,102,241,0.18);
+      --badge-bg:      rgba(99,102,241,0.15);
+      --badge-border:  rgba(99,102,241,0.3);
+      --toggle-bg:     rgba(30,27,75,0.7);
+      --toggle-border: rgba(99,102,241,0.3);
+      --step-bg:       rgba(99,102,241,0.07);
+      --divider:       rgba(99,102,241,0.12);
+    }
+
+    /* ── 배경 ── */
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', -apple-system, sans-serif;
+      min-height: 100vh;
+      color: var(--text-1);
+      overflow-x: hidden;
+      transition: color .4s;
+    }
+
+    .bg {
+      position: fixed; inset: 0; z-index: -2;
+      background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe, #00f2fe);
+      background-size: 400% 400%;
+      animation: gradShift 18s ease infinite;
+    }
+
+    [data-theme="dark"] .bg {
+      background: linear-gradient(-45deg, #0f0f23, #1a0a3c, #0d1b3e, #0f0f23);
+      background-size: 400% 400%;
+    }
+
+    @keyframes gradShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .blob {
+      position: fixed; z-index: -1; border-radius: 50%;
+      filter: blur(72px); opacity: .45; animation: blobFloat 12s ease-in-out infinite;
+    }
+    .blob-1 { width:520px; height:520px; background:#a78bfa; top:-120px; left:-100px; animation-delay:0s; }
+    .blob-2 { width:420px; height:420px; background:#38bdf8; bottom:-80px; right:-80px; animation-delay:-5s; }
+    .blob-3 { width:360px; height:360px; background:#f472b6; top:40%; left:60%; animation-delay:-9s; }
+
+    @keyframes blobFloat {
+      0%,100% { transform: translate(0,0) scale(1); }
+      33%      { transform: translate(30px,-40px) scale(1.06); }
+      66%      { transform: translate(-20px,30px) scale(.96); }
+    }
+
+    /* ── 헤더 ── */
+    .header {
+      height: 60px;
+      position: sticky; top: 0; z-index: 100;
+      background: var(--header-bg);
+      backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+      border-bottom: 1px solid var(--header-border);
+      display: flex; align-items: center;
+      padding: 0 80px 0 32px;
+      transition: background .4s, border-color .4s;
+    }
+
+    .header-left { display: flex; align-items: center; gap: 14px; }
+
+    .back-link {
+      font-size: .78rem; font-weight: 600; color: var(--text-3);
+      text-decoration: none; transition: color .18s;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    .header-title {
+      font-size: .95rem; font-weight: 700; color: var(--text-1);
+      letter-spacing: -.2px; transition: color .3s;
+    }
+    .hl { color: var(--accent); }
+
+    /* ── 네비게이션 탭 ── */
+    .nav {
+      background: var(--header-bg); backdrop-filter: blur(22px);
+      border-bottom: 1px solid var(--header-border); padding: 0 32px;
+      height: 46px; position: sticky; top: 60px; z-index: 99;
+      display: flex; align-items: center; gap: 3px;
+      overflow-x: auto; scrollbar-width: none; transition: background .4s, border-color .4s;
+    }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav-tab {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 13px; border-radius: 8px; text-decoration: none;
+      font-size: .8rem; font-weight: 600; color: var(--text-2);
+      border: 1px solid transparent; white-space: nowrap; transition: all .18s;
+    }
+    .nav-tab:hover { background: var(--surface); color: var(--text-1); border-color: var(--surface-border); }
+    .nav-tab.active { background: var(--badge-bg); color: var(--accent); border-color: var(--badge-border); }
+
+    /* ── 테마 토글 ── */
+    .theme-toggle {
+      position: fixed; top: 16px; right: 24px; z-index: 999;
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--toggle-bg); border: 1.5px solid var(--toggle-border);
+      backdrop-filter: blur(12px); cursor: pointer;
+      font-size: 16px; display: flex; align-items: center; justify-content: center;
+      transition: all .25s; box-shadow: 0 2px 12px rgba(0,0,0,.12);
+    }
+    .theme-toggle:hover { transform: scale(1.1); }
+
+    /* ── 메인 ── */
+    .main {
+      max-width: 960px; margin: 0 auto;
+      padding: 36px 24px 60px;
+    }
+
+    /* ── 글래스 카드 ── */
+    .card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border-radius: 20px;
+      padding: 36px 36px 40px;
+      margin-bottom: 24px;
+      animation: fadeUp .5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-title {
+      font-size: 1rem; font-weight: 800; color: var(--text-1);
+      letter-spacing: -.3px; margin-bottom: 6px; transition: color .3s;
+    }
+
+    .card-sub {
+      font-size: .8rem; color: var(--text-3); margin-bottom: 28px;
+      transition: color .3s;
+    }
+
+    /* ── 다이어그램 ── */
+    .diagram-wrap {
+      width: 100%; overflow-x: auto; border-radius: 14px;
+      background: var(--surface); border: 1px solid var(--surface-border);
+      padding: 24px 20px;
+    }
+
+    .diagram-wrap img {
+      display: block; width: 100%; max-width: 800px;
+      height: auto; margin: 0 auto;
+    }
+
+    /* ── 단계 카드 ── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-top: 0;
+    }
+
+    @media (max-width: 760px) {
+      .steps { grid-template-columns: repeat(2, 1fr); }
+      .step:last-child { grid-column: span 2; }
+    }
+
+    .step {
+      background: var(--step-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 14px; padding: 16px 14px;
+      transition: background .3s, border-color .3s;
+    }
+
+    .step-num {
+      font-size: .65rem; font-weight: 800; letter-spacing: 1.2px;
+      margin-bottom: 7px; transition: color .3s;
+    }
+
+    .step-icon { font-size: 1.4rem; margin-bottom: 7px; }
+
+    .step-name {
+      font-size: .85rem; font-weight: 700; color: var(--text-1);
+      margin-bottom: 5px; transition: color .3s;
+    }
+
+    .step-desc {
+      font-size: .73rem; color: var(--text-3); line-height: 1.55;
+      transition: color .3s;
+    }
+
+    .step-1 .step-num { color: #2563EB; }
+    .step-2 .step-num { color: #7C3AED; }
+    .step-3 .step-num { color: #D97706; }
+    .step-4 .step-num { color: #059669; }
+    .step-5 .step-num { color: #BE185D; }
+
+    .step-1 { border-top: 2.5px solid #2563EB; }
+    .step-2 { border-top: 2.5px solid #7C3AED; }
+    .step-3 { border-top: 2.5px solid #D97706; }
+    .step-4 { border-top: 2.5px solid #059669; }
+    .step-5 { border-top: 2.5px solid #BE185D; }
+
+    @media (max-width: 600px) {
+      .nav { padding: 0 16px; }
+      .main { padding: 24px 16px 48px; }
+      .card { padding: 24px 20px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <button class="theme-toggle" id="themeToggle" title="테마 전환">🌙</button>
+
+  <header class="header">
+    <div class="header-left">
+      <a href="index.html" class="back-link">← 메인</a>
+      <div class="header-title"><span class="hl">김비서</span> 업무 프로세스</div>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <a href="dashboard.html"      class="nav-tab" data-page="dashboard">📊 대시보드</a>
+    <a href="meeting-result.html" class="nav-tab" data-page="meeting-result">📝 회의록</a>
+    <a href="chart.html"          class="nav-tab" data-page="chart">📈 매출 현황</a>
+    <a href="diagram.html"        class="nav-tab" data-page="diagram">🔄 업무 프로세스</a>
+    <a href="report.html"         class="nav-tab" data-page="report">🔍 사이트 분석</a>
+  </nav>
+
+  <main class="main">
+
+    <div class="card" style="animation-delay:.05s">
+      <div class="card-title">🔄 콘텐츠 제작 워크플로우</div>
+      <div class="card-sub">기획부터 분석까지 — 5단계 업무 프로세스</div>
+      <div class="diagram-wrap">
+        <img src="diagram.svg" alt="업무 프로세스: 기획 → 제작 → 검토 → 배포 → 분석">
+      </div>
+    </div>
+
+    <div class="card" style="animation-delay:.15s">
+      <div class="card-title">단계별 상세 설명</div>
+      <div class="card-sub">각 단계의 주요 역할과 산출물</div>
+      <div class="steps">
+        <div class="step step-1">
+          <div class="step-num">STEP 01</div>
+          <div class="step-icon">📋</div>
+          <div class="step-name">기획</div>
+          <div class="step-desc">콘텐츠 방향 설정, 타깃 분석, 주제 및 포맷 결정</div>
+        </div>
+        <div class="step step-2">
+          <div class="step-num">STEP 02</div>
+          <div class="step-icon">⚙️</div>
+          <div class="step-name">제작</div>
+          <div class="step-desc">원고 작성, 디자인, 영상 촬영 및 편집</div>
+        </div>
+        <div class="step step-3">
+          <div class="step-num">STEP 03</div>
+          <div class="step-icon">🔍</div>
+          <div class="step-name">검토</div>
+          <div class="step-desc">팀 내 리뷰, 수정 반영, 최종 승인</div>
+        </div>
+        <div class="step step-4">
+          <div class="step-num">STEP 04</div>
+          <div class="step-icon">🚀</div>
+          <div class="step-name">배포</div>
+          <div class="step-desc">채널별 업로드, 예약 발행, 광고 집행</div>
+        </div>
+        <div class="step step-5">
+          <div class="step-num">STEP 05</div>
+          <div class="step-icon">📊</div>
+          <div class="step-name">분석</div>
+          <div class="step-desc">성과 지표 측정, 인사이트 도출, 다음 기획 반영</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    /* ── 네비게이션 활성 탭 ── */
+    (function() {
+      const page = location.pathname.split('/').pop().replace(/\.[^.]+$/, '') || 'dashboard';
+      document.querySelectorAll('.nav-tab').forEach(a => {
+        if (a.dataset.page === page) a.classList.add('active');
+      });
+    })();
+
+    /* ── 테마 ── */
+    const html = document.documentElement;
+    const btn  = document.getElementById('themeToggle');
+    function applyTheme(t) {
+      html.setAttribute('data-theme', t);
+      btn.textContent = t === 'dark' ? '☀️' : '🌙';
+    }
+    applyTheme(localStorage.getItem('kim-theme') || 'light');
+    btn.addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('kim-theme', next);
+      applyTheme(next);
+    });
+  </script>
+</body>
+</html>

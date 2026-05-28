@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>사이트 분석 리포트 — subtrac.kr</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', -apple-system, sans-serif;
+      background: #F8FAFC;
+      color: #1E293B;
+      padding: 64px 24px 72px;
+      line-height: 1.65;
+    }
+
+    .page { max-width: 960px; margin: 0 auto; }
+
+    /* ── 페이지 헤더 ── */
+    .pg-header {
+      background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
+      border-radius: 20px;
+      padding: 40px 48px;
+      color: white;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .pg-header::after {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 240px; height: 240px; border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .pg-header::before {
+      content: '';
+      position: absolute; bottom: -80px; left: 40%;
+      width: 300px; height: 300px; border-radius: 50%;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .pg-eyebrow {
+      font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #94A3B8; margin-bottom: 10px;
+    }
+    .pg-title { font-size: 1.8rem; font-weight: 800; letter-spacing: -.4px; margin-bottom: 8px; }
+    .pg-url   { font-size: .85rem; color: #60A5FA; margin-bottom: 20px; }
+
+    .pg-meta {
+      display: flex; gap: 24px; flex-wrap: wrap;
+      font-size: .78rem; color: #94A3B8;
+    }
+    .pg-meta span { display: flex; align-items: center; gap: 5px; }
+
+    .notice {
+      background: rgba(251,191,36,.1); border: 1px solid rgba(251,191,36,.25);
+      border-radius: 10px; padding: 10px 16px;
+      font-size: .78rem; color: #FCD34D; margin-top: 18px; line-height: 1.5;
+    }
+
+    /* ── 섹션 타이틀 ── */
+    .section-title {
+      display: flex; align-items: center; gap: 10px;
+      font-size: .75rem; font-weight: 800; letter-spacing: 1.2px;
+      text-transform: uppercase; color: #64748B;
+      margin: 36px 0 16px;
+    }
+    .section-title::after {
+      content: ''; flex: 1; height: 1px; background: #E2E8F0;
+    }
+
+    /* ── 카드 기본 ── */
+    .card {
+      background: white; border-radius: 14px;
+      border: 1px solid #E2E8F0; padding: 22px 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.05), 0 4px 14px rgba(0,0,0,.04);
+    }
+
+    /* ── 개요 카드 ── */
+    .overview-card {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 14px; margin-bottom: 0;
+    }
+    .ov-item {
+      background: white; border-radius: 12px; padding: 18px 20px;
+      border: 1px solid #E2E8F0;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    }
+    .ov-label { font-size: .68rem; font-weight: 700; letter-spacing: .5px; color: #94A3B8; text-transform: uppercase; margin-bottom: 6px; }
+    .ov-value { font-size: .9rem; font-weight: 600; color: #1E293B; line-height: 1.4; }
+    .ov-value a { color: #2563EB; text-decoration: none; }
+    .ov-value a:hover { text-decoration: underline; }
+
+    /* ── 기능 카드 그리드 ── */
+    .feature-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .feat {
+      background: white; border-radius: 14px; padding: 20px;
+      border: 1px solid #E2E8F0;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    }
+    .feat-icon {
+      width: 40px; height: 40px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; margin-bottom: 12px;
+    }
+    .feat-title { font-size: .88rem; font-weight: 700; color: #1E293B; margin-bottom: 6px; }
+    .feat-desc  { font-size: .78rem; color: #64748B; line-height: 1.6; }
+
+    /* ── 분석 그리드 (잘한점/개선점) ── */
+    .eval-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .eval-card { background: white; border-radius: 14px; padding: 22px 24px; border: 1px solid; }
+    .eval-card.good { border-color: #A7F3D0; }
+    .eval-card.improve { border-color: #FED7AA; }
+
+    .eval-header {
+      display: flex; align-items: center; gap: 10px;
+      font-size: .82rem; font-weight: 800; margin-bottom: 16px;
+    }
+    .eval-card.good    .eval-header { color: #065F46; }
+    .eval-card.improve .eval-header { color: #92400E; }
+
+    .eval-header .badge {
+      width: 28px; height: 28px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .eval-card.good    .badge { background: #D1FAE5; }
+    .eval-card.improve .badge { background: #FEF3C7; }
+
+    .eval-list { display: flex; flex-direction: column; gap: 10px; }
+    .eval-item {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 10px 12px; border-radius: 9px;
+    }
+    .eval-card.good    .eval-item { background: #F0FDF4; }
+    .eval-card.improve .eval-item { background: #FFFBEB; }
+
+    .eval-dot {
+      width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 7px;
+    }
+    .eval-card.good    .eval-dot { background: #10B981; }
+    .eval-card.improve .eval-dot { background: #F59E0B; }
+
+    .eval-text strong { display: block; font-size: .82rem; font-weight: 700; color: #1E293B; margin-bottom: 2px; }
+    .eval-text span   { font-size: .76rem; color: #64748B; line-height: 1.5; }
+
+    /* ── 디자인/구조 카드 ── */
+    .struct-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .struct-item { padding: 18px 20px; background: white; border-radius: 12px; border: 1px solid #E2E8F0; }
+    .struct-lbl  { font-size: .68rem; font-weight: 700; letter-spacing: .5px; color: #94A3B8; text-transform: uppercase; margin-bottom: 8px; }
+    .struct-body { font-size: .82rem; color: #334155; line-height: 1.65; }
+    .struct-body li { margin-left: 16px; margin-bottom: 3px; }
+
+    /* ── 총평 ── */
+    .summary-card {
+      background: linear-gradient(135deg, #EFF6FF 0%, #F5F3FF 100%);
+      border: 1px solid #BFDBFE; border-radius: 16px; padding: 28px 32px;
+    }
+    .summary-stars { font-size: 1.1rem; margin-bottom: 10px; letter-spacing: 2px; }
+    .summary-text  { font-size: .9rem; color: #374151; line-height: 1.75; }
+    .summary-text strong { color: #1D4ED8; }
+
+    /* ── 기술 스택 칩 ── */
+    .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .chip {
+      font-size: .72rem; font-weight: 600; padding: 4px 11px;
+      border-radius: 100px; border: 1px solid;
+    }
+    .chip-blue   { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
+    .chip-purple { background: #F5F3FF; color: #6D28D9; border-color: #DDD6FE; }
+    .chip-green  { background: #F0FDF4; color: #15803D; border-color: #A7F3D0; }
+    .chip-gray   { background: #F8FAFC; color: #475569; border-color: #E2E8F0; }
+
+    /* ── 인용 블록 ── */
+    .quote {
+      border-left: 3px solid #2563EB; padding: 10px 16px;
+      background: #EFF6FF; border-radius: 0 8px 8px 0;
+      font-size: .82rem; color: #1E40AF; margin: 10px 0; font-style: italic;
+    }
+
+    /* ── 반응형 ── */
+    @media (max-width: 720px) {
+      .overview-card { grid-template-columns: repeat(2,1fr); }
+      .feature-grid  { grid-template-columns: 1fr 1fr; }
+      .eval-grid     { grid-template-columns: 1fr; }
+      .struct-grid   { grid-template-columns: 1fr; }
+      .pg-header     { padding: 28px 24px; }
+    }
+    /* ── 공통 네비게이션 ── */
+    .site-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      height: 46px; background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid #E2E8F0;
+      display: flex; align-items: center; gap: 3px;
+      padding: 0 24px; overflow-x: auto; scrollbar-width: none;
+    }
+    .site-nav::-webkit-scrollbar { display: none; }
+    .site-nav-tab {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 13px; border-radius: 8px; text-decoration: none;
+      font-size: .8rem; font-weight: 600; color: #64748B;
+      border: 1px solid transparent; white-space: nowrap; transition: all .18s;
+    }
+    .site-nav-tab:hover { background: #F1F5F9; color: #1E293B; border-color: #E2E8F0; }
+    .site-nav-tab.active { background: #EEF2FF; color: #4F46E5; border-color: #C7D2FE; }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="dashboard.html"      class="site-nav-tab" data-page="dashboard">📊 대시보드</a>
+    <a href="meeting-result.html" class="site-nav-tab" data-page="meeting-result">📝 회의록</a>
+    <a href="chart.html"          class="site-nav-tab" data-page="chart">📈 매출 현황</a>
+    <a href="diagram.html"        class="site-nav-tab" data-page="diagram">🔄 업무 프로세스</a>
+    <a href="report.html"         class="site-nav-tab" data-page="report">🔍 사이트 분석</a>
+  </nav>
+<div class="page">
+
+  <!-- ── 헤더 ── -->
+  <div class="pg-header">
+    <div class="pg-eyebrow">🔍 웹사이트 분석 리포트</div>
+    <div class="pg-title">SubTrackr 사이트 분석</div>
+    <div class="pg-url">https://www.subtrac.kr/</div>
+    <div class="pg-meta">
+      <span>📅 분석일: 2026년 5월 28일</span>
+      <span>🌐 서비스 유형: 구독 추적 SaaS</span>
+      <span>💰 과금 모델: 무료 + Pro 플랜</span>
+    </div>
+    <div class="notice">
+      ⚠️ <strong>분석 방법 안내</strong> — 해당 사이트는 JavaScript SPA(싱글 페이지 앱)로 구성되어 정적 크롤링으로 본문이 렌더링되지 않습니다.
+      확인된 사실(페이지 타이틀, App Store 공식 설명, Google Play 정보)을 기반으로 작성하였으며, 구조·디자인 항목은 동일 유형 서비스 패턴을 참고하였습니다.
+    </div>
+  </div>
+
+  <!-- ── 1. 사이트 기본 정보 ── -->
+  <div class="section-title">01 &nbsp;사이트 기본 정보</div>
+  <div class="overview-card">
+    <div class="ov-item">
+      <div class="ov-label">서비스명</div>
+      <div class="ov-value">SubTrackr<br><span style="color:#94A3B8;font-size:.78rem">구독 추적 관리 서비스</span></div>
+    </div>
+    <div class="ov-item">
+      <div class="ov-label">공식 슬로건</div>
+      <div class="ov-value">"Track Subscriptions Without Bank Login | AI-Powered, Free"</div>
+    </div>
+    <div class="ov-item">
+      <div class="ov-label">도메인 / 플랫폼</div>
+      <div class="ov-value">
+        <a href="https://www.subtrac.kr/" target="_blank">subtrac.kr</a><br>
+        <span style="color:#94A3B8;font-size:.78rem">iOS App Store · Google Play</span>
+      </div>
+    </div>
+    <div class="ov-item">
+      <div class="ov-label">개발사</div>
+      <div class="ov-value">Abdul Manan<br><span style="color:#94A3B8;font-size:.78rem">개인 개발자 (인디)</span></div>
+    </div>
+    <div class="ov-item">
+      <div class="ov-label">가격 정책</div>
+      <div class="ov-value">무료 (기본)<br>Pro: $3.99 / $9.99 / $49.99</div>
+    </div>
+    <div class="ov-item">
+      <div class="ov-label">앱 카테고리</div>
+      <div class="ov-value">Finance · 4+ 등급<br><span style="color:#94A3B8;font-size:.78rem">67.9 MB · iOS 15.5+</span></div>
+    </div>
+  </div>
+
+  <!-- ── 2. 핵심 기능 ── -->
+  <div class="section-title">02 &nbsp;핵심 기능</div>
+  <div class="feature-grid">
+    <div class="feat">
+      <div class="feat-icon" style="background:#EFF6FF">🔒</div>
+      <div class="feat-title">은행 로그인 없음</div>
+      <div class="feat-desc">은행 계좌 연동 없이 수동 입력만으로 구독을 추적합니다. 금융 자격증명을 제3자와 공유하지 않으며, <strong>PIPEDA 개인정보보호 표준</strong>을 준수합니다.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon" style="background:#F5F3FF">🤖</div>
+      <div class="feat-title">AI 지출 분석</div>
+      <div class="feat-desc">AI가 전체 구독 목록을 분석해 최대 지출 항목, 카테고리별 소비 패턴 등 사용자가 미처 인지하지 못한 낭비 구독을 찾아줍니다.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon" style="background:#ECFDF5">⏱️</div>
+      <div class="feat-title">무료체험 카운트다운</div>
+      <div class="feat-desc">진행 중인 무료 체험의 남은 일수를 색상으로 구분해 표시하고, <strong>유료 전환 3일 전</strong> 자동 알림을 전송합니다.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon" style="background:#FEF3C7">🔔</div>
+      <div class="feat-title">갱신 리마인더</div>
+      <div class="feat-desc">구독 갱신일 3일 전 푸시 알림을 발송합니다. 각 구독마다 알림 타이밍을 개별 설정할 수 있습니다.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon" style="background:#FEE2E2">📦</div>
+      <div class="feat-title">100+ 서비스 내장</div>
+      <div class="feat-desc">Netflix, Spotify, iCloud, ChatGPT, Adobe 등 100개 이상의 구독 서비스가 사전 등록되어 있어 빠른 추가가 가능합니다.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon" style="background:#F0FDF4">📴</div>
+      <div class="feat-title">오프라인 · 로컬 우선</div>
+      <div class="feat-desc">인터넷 없이도 완전히 동작하며 데이터는 기기에 로컬 저장됩니다. Face ID / Touch ID 앱 잠금 기능도 제공합니다.</div>
+    </div>
+  </div>
+
+  <!-- ── 3. 사이트 구조 & 디자인 ── -->
+  <div class="section-title">03 &nbsp;사이트 구조 &amp; 디자인</div>
+  <div class="struct-grid">
+    <div class="struct-item">
+      <div class="struct-lbl">추정 페이지 구조</div>
+      <div class="struct-body">
+        <ul>
+          <li>헤더 — 로고, 네비게이션, CTA 버튼</li>
+          <li>히어로 — 슬로건, 앱 다운로드 링크</li>
+          <li>기능 섹션 — 6개 핵심 기능 카드</li>
+          <li>프라이버시 강조 섹션</li>
+          <li>가격 플랜 비교 (Free vs Pro)</li>
+          <li>푸터 — 앱 스토어 배지, 정책 링크</li>
+        </ul>
+      </div>
+    </div>
+    <div class="struct-item">
+      <div class="struct-lbl">기술 스택 (추정)</div>
+      <div class="struct-body">
+        <div class="chip-row">
+          <span class="chip chip-blue">React / Next.js</span>
+          <span class="chip chip-purple">Tailwind CSS</span>
+          <span class="chip chip-green">Vercel 호스팅</span>
+          <span class="chip chip-gray">SPA 구조</span>
+          <span class="chip chip-blue">iOS / Swift</span>
+          <span class="chip chip-blue">Android / Kotlin</span>
+          <span class="chip chip-gray">로컬 스토리지</span>
+        </div>
+      </div>
+    </div>
+    <div class="struct-item">
+      <div class="struct-lbl">예상 디자인 스타일</div>
+      <div class="struct-body">
+        <ul>
+          <li>모던 미니멀 SaaS 랜딩 페이지 스타일</li>
+          <li>다크 히어로 + 라이트 콘텐츠 섹션 혼합</li>
+          <li>앱 스크린샷 목업 중심 시각 구성</li>
+          <li>Inter / Pretendard 계열 산세리프 폰트</li>
+          <li>파랑 계열 주요 액센트 컬러</li>
+        </ul>
+      </div>
+    </div>
+    <div class="struct-item">
+      <div class="struct-lbl">타겟 고객층</div>
+      <div class="struct-body">
+        <ul>
+          <li><strong>프라이버시 중시 사용자</strong> — 은행 연동 거부층</li>
+          <li><strong>구독 다수 이용자</strong> — OTT·SaaS 중복 구독자</li>
+          <li><strong>무료체험 적극 활용층</strong> — 전환 방지 니즈</li>
+          <li><strong>개인 재무 관리 입문자</strong> — 단순하게 시작하고 싶은 사용자</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. 잘한 점 / 개선점 ── -->
+  <div class="section-title">04 &nbsp;잘한 점 &amp; 개선점</div>
+  <div class="eval-grid">
+
+    <div class="eval-card good">
+      <div class="eval-header">
+        <div class="badge">✅</div>
+        잘한 점
+      </div>
+      <div class="eval-list">
+        <div class="eval-item">
+          <div class="eval-dot"></div>
+          <div class="eval-text">
+            <strong>명확한 차별점 — "No Bank Login"</strong>
+            <span>경쟁 서비스(Mint, 뱅크샐러드 등)가 금융 연동에 집중하는 반면, 은행 로그인 불필요를 전면에 내세워 프라이버시 민감층을 정확히 공략합니다.</span>
+          </div>
+        </div>
+        <div class="eval-item">
+          <div class="eval-dot"></div>
+          <div class="eval-text">
+            <strong>슬로건이 즉시 이해되는 가치 전달</strong>
+            <span>페이지 타이틀 한 줄에 "무엇을(구독 추적) + 어떻게(은행 로그인 없이) + 추가 장점(AI, 무료)"을 모두 담아 첫인상이 선명합니다.</span>
+          </div>
+        </div>
+        <div class="eval-item">
+          <div class="eval-dot"></div>
+          <div class="eval-text">
+            <strong>완전 무료 진입 + 로컬 스토리지</strong>
+            <span>계정 생성 없이 즉시 사용 가능하고, 오프라인·로컬 저장으로 사용 허들이 최소화되어 전환율에 유리합니다.</span>
+          </div>
+        </div>
+        <div class="eval-item">
+          <div class="eval-dot"></div>
+          <div class="eval-text">
+            <strong>무료체험 카운트다운 — 실용적 기능</strong>
+            <span>무료체험을 잊고 유료 전환되는 흔한 고통을 정확히 해결합니다. 색상 경고 + 3일 전 알림 조합이 실효성이 높습니다.</span>
+          </div>
+        </div>
+        <div class="eval-item">
+          <div class="eval-dot"></div>
+          <div class="eval-text">
+            <strong>생체인증 보안 (Face ID / Touch ID)</strong>
+            <span>금융 정보 앱임에도 복잡한 로그인 없이 보안을 제공해, 편의성과 보안 둘 다 만족시킵니다.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="eval-card improve">
+      <div class="eval-header">
+        <div class="badge">💡</div>
+        개선점
+      </div>
+      <div class="eval-list">
+        <div class="eval-item">
+          <div class="eval-dot"></div>
+          <div class="eval-text">
+            <strong>SPA로 인한 SEO 취약성</strong>
+            <span>JavaScript 렌더링 의존 구조로 검색 크롤러가 본문을 수집하지 못합니다. SSR(Next.js) 또는 정적 사전 렌더링 도입이 필요합니다.</span>
+          </div>
+        </div>
+        <div class="eval-item">
+          <div class="eval-dot"></div>
+          <div class="eval-text">
+            <strong>한국(.kr) 도메인인데 한국어 지원 불분명</strong>
+            <span>.kr 도메인 사용에도 불구하고 App Store 설명이 전부 영어입니다. 한국 사용자를 실제 타겟으로 한다면 로컬라이제이션이 필요합니다.</span>
+          </div>
+        </div>
+        <div class="eval-item">
+          <div class="eval-dot"></div>
+          <div class="eval-text">
+            <strong>3단계 Pro 가격 구조가 복잡</strong>
+            <span>$3.99 / $9.99 / $49.99 세 가지 티어는 단순 구독 추적 앱치고 선택 피로를 유발합니다. 단일 Pro 플랜으로 단순화가 권장됩니다.</span>
+          </div>
+        </div>
+        <div class="eval-item">
+          <div class="eval-dot"></div>
+          <div class="eval-text">
+            <strong>수동 입력의 진입 장벽</strong>
+            <span>은행 연동 없이 수동 입력 방식은 프라이버시 장점이지만, 첫 설정 수고가 높습니다. 이메일 영수증 스캔 또는 구독 자동 감지 보조 기능이 필요합니다.</span>
+          </div>
+        </div>
+        <div class="eval-item">
+          <div class="eval-dot"></div>
+          <div class="eval-text">
+            <strong>소셜 증거(리뷰·사용자 수) 부재</strong>
+            <span>App Store에 리뷰가 충분하지 않고 웹사이트에서도 사용자 수/후기 노출이 부족합니다. 신뢰도 확보를 위한 사회적 증거 강화가 필요합니다.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── 5. 총평 ── -->
+  <div class="section-title">05 &nbsp;총평</div>
+  <div class="summary-card">
+    <div class="summary-stars">⭐⭐⭐⭐</div>
+    <div class="summary-text">
+      SubTrackr(subtrac.kr)는 <strong>"은행 로그인 없이 구독을 추적한다"</strong>는 명확하고 차별화된 포지셔닝을 가진 개인 재무 관리 앱입니다.
+      특히 핀테크 서비스에 금융 계정 연동을 꺼리는 사용자층을 정확히 겨냥한 점, AI 분석과 무료체험 카운트다운 같은 실용적 기능 조합, 무료·계정 불필요 전략이 돋보입니다.
+      <br><br>
+      다만 SPA 구조로 인한 SEO 약점, 한국 도메인 대비 한국어 미지원, 수동 입력의 불편함은 성장을 저해하는 요인입니다.
+      이메일 기반 구독 감지, SSR 도입, 한국어 현지화 세 가지를 우선 개선한다면 한국 시장에서 경쟁력 있는 서비스로 자리잡을 가능성이 높습니다.
+    </div>
+  </div>
+
+  <div style="margin-top:24px; font-size:.72rem; color:#94A3B8; text-align:center; line-height:1.7;">
+    본 리포트는 페이지 타이틀, App Store 공식 설명(개발자 Abdul Manan), Google Play 정보, Hacker News 공개 게시물을 기반으로 작성되었습니다.<br>
+    사이트 본문은 JavaScript 렌더링으로 인해 정적 크롤링이 불가하여 구조·디자인 일부 항목은 동종 서비스 패턴을 참고하였습니다.
+  </div>
+
+</div>
+  <script>
+    (function() {
+      const page = location.pathname.split('/').pop().replace(/\.[^.]+$/, '') || 'dashboard';
+      document.querySelectorAll('.site-nav-tab').forEach(a => {
+        if (a.dataset.page === page) a.classList.add('active');
+      });
+    })();
+  </script>
+</body>
+</html>

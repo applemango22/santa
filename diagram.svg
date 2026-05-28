@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="800" height="200" viewBox="0 0 800 200">
+
+  <title>업무 프로세스 다이어그램 — 기획 · 제작 · 검토 · 배포 · 분석</title>
+
+  <defs>
+    <!-- 배경 그라디언트 -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#EFF6FF"/>
+      <stop offset="100%" stop-color="#F5F3FF"/>
+    </linearGradient>
+
+    <!-- 박스 그림자 -->
+    <filter id="shadow" x="-15%" y="-25%" width="130%" height="160%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4"
+                    flood-color="#94A3B8" flood-opacity="0.18"/>
+    </filter>
+
+    <!-- 숫자 배지 그림자 -->
+    <filter id="badgeShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2"
+                    flood-color="#000" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="800" height="200" fill="url(#bg)"/>
+
+  <!-- ══════════════════════════════════════════
+       STEP 1 — 기획  (x=24, cx=84)
+  ══════════════════════════════════════════ -->
+  <!-- 박스 -->
+  <rect x="24" y="64" width="120" height="72" rx="14"
+        fill="#DBEAFE" stroke="#BFDBFE" stroke-width="1.5"
+        filter="url(#shadow)"/>
+  <!-- 숫자 배지 -->
+  <circle cx="84" cy="64" r="13" fill="#2563EB" filter="url(#badgeShadow)"/>
+  <text x="84" y="68.8" text-anchor="middle"
+        fill="white" font-size="12" font-weight="700"
+        font-family="'Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif">1</text>
+  <!-- 아이콘 -->
+  <text x="84" y="106" text-anchor="middle" font-size="22"
+        font-family="'Apple Color Emoji','Segoe UI Emoji',sans-serif">📋</text>
+  <!-- 레이블 -->
+  <text x="84" y="126" text-anchor="middle"
+        fill="#1E40AF" font-size="14" font-weight="700" letter-spacing="-0.3"
+        font-family="'Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif">기획</text>
+
+  <!-- ── 화살표 1 ── -->
+  <line x1="148" y1="100" x2="179" y2="100"
+        stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"/>
+  <polygon points="176,93.5 188,100 176,106.5" fill="#94A3B8"/>
+
+  <!-- ══════════════════════════════════════════
+       STEP 2 — 제작  (x=188, cx=248)
+  ══════════════════════════════════════════ -->
+  <rect x="188" y="64" width="120" height="72" rx="14"
+        fill="#EDE9FE" stroke="#DDD6FE" stroke-width="1.5"
+        filter="url(#shadow)"/>
+  <circle cx="248" cy="64" r="13" fill="#7C3AED" filter="url(#badgeShadow)"/>
+  <text x="248" y="68.8" text-anchor="middle"
+        fill="white" font-size="12" font-weight="700"
+        font-family="'Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif">2</text>
+  <text x="248" y="106" text-anchor="middle" font-size="22"
+        font-family="'Apple Color Emoji','Segoe UI Emoji',sans-serif">⚙️</text>
+  <text x="248" y="126" text-anchor="middle"
+        fill="#5B21B6" font-size="14" font-weight="700" letter-spacing="-0.3"
+        font-family="'Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif">제작</text>
+
+  <!-- ── 화살표 2 ── -->
+  <line x1="312" y1="100" x2="343" y2="100"
+        stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"/>
+  <polygon points="340,93.5 352,100 340,106.5" fill="#94A3B8"/>
+
+  <!-- ══════════════════════════════════════════
+       STEP 3 — 검토  (x=352, cx=412)
+  ══════════════════════════════════════════ -->
+  <rect x="352" y="64" width="120" height="72" rx="14"
+        fill="#FEF3C7" stroke="#FDE68A" stroke-width="1.5"
+        filter="url(#shadow)"/>
+  <circle cx="412" cy="64" r="13" fill="#D97706" filter="url(#badgeShadow)"/>
+  <text x="412" y="68.8" text-anchor="middle"
+        fill="white" font-size="12" font-weight="700"
+        font-family="'Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif">3</text>
+  <text x="412" y="106" text-anchor="middle" font-size="22"
+        font-family="'Apple Color Emoji','Segoe UI Emoji',sans-serif">🔍</text>
+  <text x="412" y="126" text-anchor="middle"
+        fill="#92400E" font-size="14" font-weight="700" letter-spacing="-0.3"
+        font-family="'Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif">검토</text>
+
+  <!-- ── 화살표 3 ── -->
+  <line x1="476" y1="100" x2="507" y2="100"
+        stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"/>
+  <polygon points="504,93.5 516,100 504,106.5" fill="#94A3B8"/>
+
+  <!-- ══════════════════════════════════════════
+       STEP 4 — 배포  (x=516, cx=576)
+  ══════════════════════════════════════════ -->
+  <rect x="516" y="64" width="120" height="72" rx="14"
+        fill="#D1FAE5" stroke="#A7F3D0" stroke-width="1.5"
+        filter="url(#shadow)"/>
+  <circle cx="576" cy="64" r="13" fill="#059669" filter="url(#badgeShadow)"/>
+  <text x="576" y="68.8" text-anchor="middle"
+        fill="white" font-size="12" font-weight="700"
+        font-family="'Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif">4</text>
+  <text x="576" y="106" text-anchor="middle" font-size="22"
+        font-family="'Apple Color Emoji','Segoe UI Emoji',sans-serif">🚀</text>
+  <text x="576" y="126" text-anchor="middle"
+        fill="#065F46" font-size="14" font-weight="700" letter-spacing="-0.3"
+        font-family="'Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif">배포</text>
+
+  <!-- ── 화살표 4 ── -->
+  <line x1="640" y1="100" x2="671" y2="100"
+        stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"/>
+  <polygon points="668,93.5 680,100 668,106.5" fill="#94A3B8"/>
+
+  <!-- ══════════════════════════════════════════
+       STEP 5 — 분석  (x=680, cx=740)
+  ══════════════════════════════════════════ -->
+  <rect x="680" y="64" width="120" height="72" rx="14"
+        fill="#FCE7F3" stroke="#FBCFE8" stroke-width="1.5"
+        filter="url(#shadow)"/>
+  <circle cx="740" cy="64" r="13" fill="#BE185D" filter="url(#badgeShadow)"/>
+  <text x="740" y="68.8" text-anchor="middle"
+        fill="white" font-size="12" font-weight="700"
+        font-family="'Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif">5</text>
+  <text x="740" y="106" text-anchor="middle" font-size="22"
+        font-family="'Apple Color Emoji','Segoe UI Emoji',sans-serif">📊</text>
+  <text x="740" y="126" text-anchor="middle"
+        fill="#9D174D" font-size="14" font-weight="700" letter-spacing="-0.3"
+        font-family="'Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif">분석</text>
+
+</svg>

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회의록 — 마케팅팀 주간회의 2026.03.10</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ── 화면용 ── */
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', -apple-system, sans-serif;
+      background: #F1F5F9;
+      color: #1E293B;
+      padding: 64px 24px 48px;
+      line-height: 1.6;
+    }
+
+    .page {
+      max-width: 820px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    /* ── 헤더 배너 ── */
+    .page-header {
+      background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+      padding: 36px 48px 32px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+    }
+
+    .page-header::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: 30%;
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .doc-type {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: .75;
+      margin-bottom: 10px;
+    }
+
+    .doc-title {
+      font-size: 1.7rem;
+      font-weight: 800;
+      letter-spacing: -.3px;
+      margin-bottom: 20px;
+    }
+
+    .meta-row {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .meta-item { display: flex; flex-direction: column; gap: 3px; }
+    .meta-label { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; opacity: .65; text-transform: uppercase; }
+    .meta-value { font-size: .9rem; font-weight: 600; }
+
+    /* ── 본문 ── */
+    .body { padding: 40px 48px 48px; }
+
+    /* 섹션 공통 */
+    .section { margin-bottom: 36px; }
+    .section:last-child { margin-bottom: 0; }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #4F46E5;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #EEF2FF;
+    }
+
+    .section-title .icon {
+      width: 26px; height: 26px;
+      background: #EEF2FF; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+    }
+
+    /* ── 논의 내용 요약 ── */
+    .summary-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .summary-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background: #F8FAFC;
+      border-left: 3px solid #4F46E5;
+      border-radius: 0 10px 10px 0;
+      padding: 12px 16px;
+    }
+
+    .summary-num {
+      flex-shrink: 0;
+      width: 22px; height: 22px;
+      background: #4F46E5; color: white;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800;
+      margin-top: 1px;
+    }
+
+    .summary-text {
+      font-size: .875rem;
+      color: #334155;
+      line-height: 1.65;
+    }
+
+    .summary-text strong { color: #1E293B; font-weight: 700; }
+
+    /* ── 액션 아이템 테이블 ── */
+    .action-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .875rem;
+    }
+
+    .action-table thead tr {
+      background: #4F46E5;
+      color: white;
+    }
+
+    .action-table thead th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: .76rem;
+      font-weight: 700;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+    }
+
+    .action-table thead th:first-child { border-radius: 10px 0 0 0; }
+    .action-table thead th:last-child  { border-radius: 0 10px 0 0; }
+
+    .action-table tbody tr {
+      border-bottom: 1px solid #E2E8F0;
+      transition: background .15s;
+    }
+
+    .action-table tbody tr:last-child { border-bottom: none; }
+    .action-table tbody tr:hover { background: #F8FAFC; }
+
+    .action-table td {
+      padding: 13px 16px;
+      vertical-align: middle;
+    }
+
+    .assignee-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #EEF2FF;
+      color: #4338CA;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: .78rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .action-text {
+      color: #334155;
+      line-height: 1.5;
+    }
+
+    .due-chip {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: .76rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .due-urgent { background: #FEE2E2; color: #DC2626; }
+    .due-normal { background: #FEF3C7; color: #B45309; }
+    .due-later  { background: #DCFCE7; color: #15803D; }
+    .due-next   { background: #E0E7FF; color: #3730A3; }
+
+    /* ── 푸터 ── */
+    .page-footer {
+      border-top: 1px solid #E2E8F0;
+      padding: 20px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #F8FAFC;
+    }
+
+    .footer-note { font-size: .76rem; color: #94A3B8; }
+    .footer-next {
+      font-size: .8rem;
+      color: #4F46E5;
+      font-weight: 600;
+      background: #EEF2FF;
+      padding: 6px 14px;
+      border-radius: 8px;
+    }
+
+    .print-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 24px auto 0;
+      max-width: 820px;
+      justify-content: flex-end;
+    }
+
+    .print-btn button {
+      display: flex; align-items: center; gap: 7px;
+      background: white; color: #475569;
+      border: 1px solid #E2E8F0;
+      padding: 9px 18px; border-radius: 10px;
+      font-size: .84rem; font-weight: 600;
+      cursor: pointer; transition: all .15s;
+      font-family: inherit;
+    }
+
+    .print-btn button:hover {
+      background: #F8FAFC;
+      border-color: #CBD5E1;
+      color: #1E293B;
+    }
+
+    /* ── 공통 네비게이션 ── */
+    .site-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      height: 46px; background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid #E2E8F0;
+      display: flex; align-items: center; gap: 3px;
+      padding: 0 24px; overflow-x: auto; scrollbar-width: none;
+    }
+    .site-nav::-webkit-scrollbar { display: none; }
+    .site-nav-tab {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 13px; border-radius: 8px; text-decoration: none;
+      font-size: .8rem; font-weight: 600; color: #64748B;
+      border: 1px solid transparent; white-space: nowrap; transition: all .18s;
+    }
+    .site-nav-tab:hover { background: #F1F5F9; color: #1E293B; border-color: #E2E8F0; }
+    .site-nav-tab.active { background: #EEF2FF; color: #4F46E5; border-color: #C7D2FE; }
+
+    /* ── 인쇄 스타일 ── */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+
+      .page {
+        max-width: 100%;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .page-header {
+        /* 인쇄 시 배경색 출력 허용 */
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        padding: 28px 40px 24px;
+      }
+
+      .body { padding: 32px 40px 40px; }
+
+      .site-nav { display: none; }
+      .print-btn { display: none; }
+
+      .action-table tbody tr:hover { background: transparent; }
+
+      .summary-item,
+      .assignee-chip,
+      .due-chip,
+      .footer-next {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .action-table thead tr {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .page-footer { background: #F8FAFC; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+      @page {
+        margin: 16mm 14mm;
+        size: A4;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav">
+    <a href="dashboard.html"      class="site-nav-tab" data-page="dashboard">📊 대시보드</a>
+    <a href="meeting-result.html" class="site-nav-tab" data-page="meeting-result">📝 회의록</a>
+    <a href="chart.html"          class="site-nav-tab" data-page="chart">📈 매출 현황</a>
+    <a href="diagram.html"        class="site-nav-tab" data-page="diagram">🔄 업무 프로세스</a>
+    <a href="report.html"         class="site-nav-tab" data-page="report">🔍 사이트 분석</a>
+  </nav>
+
+  <div class="print-btn">
+    <button onclick="window.print()">🖨️ 인쇄 / PDF 저장</button>
+  </div>
+
+  <div class="page">
+
+    <!-- ── 헤더 ── -->
+    <div class="page-header">
+      <div class="doc-type">Meeting Minutes</div>
+      <div class="doc-title">마케팅팀 주간회의</div>
+      <div class="meta-row">
+        <div class="meta-item">
+          <span class="meta-label">일시</span>
+          <span class="meta-value">2026년 3월 10일 (월)</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">장소</span>
+          <span class="meta-value">마케팅팀 회의실</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">참석자</span>
+          <span class="meta-value">김대리 · 이과장 · 박사원 · 정팀장</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">작성</span>
+          <span class="meta-value">김비서 AI</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 본문 ── -->
+    <div class="body">
+
+      <!-- 논의 내용 요약 -->
+      <div class="section">
+        <div class="section-title">
+          <div class="icon">📝</div>
+          논의 내용 요약
+        </div>
+        <div class="summary-list">
+          <div class="summary-item">
+            <div class="summary-num">1</div>
+            <div class="summary-text">
+              SNS 광고 A/B 테스트 결과, <strong>B안(영상형)의 클릭률이 A안(이미지형) 대비 2.3배 높음</strong>을 확인하였으며, B안 기반으로 영상 광고 3개를 추가 제작하기로 결정하였다.
+            </div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-num">2</div>
+            <div class="summary-text">
+              인플루언서 협업 제안서 발송 3곳 중 <strong>1곳(푸드스타일리 김OO)으로부터 회신</strong>이 도착하였으며, 수요일(3/12) 미팅 일정을 확정하였다.
+            </div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-num">3</div>
+            <div class="summary-text">
+              4월 신제품 런칭 일정에 맞춰 <strong>사전 티저 콘텐츠를 3월 넷째 주부터 시작</strong>하기로 합의하였다.
+            </div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-num">4</div>
+            <div class="summary-text">
+              영상 광고 제작비 <strong>추가 200만원 예산 조정 요청</strong>이 필요하며, 관련 안건은 차주 보고 예정이다.
+            </div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-num">5</div>
+            <div class="summary-text">
+              3월 프로모션 기획안 초안(담당: 김대리)을 <strong>3월 12일(수)까지 작성</strong>하여 3월 17일 차주 회의에서 전체 검토를 진행하기로 하였다.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 액션 아이템 -->
+      <div class="section">
+        <div class="section-title">
+          <div class="icon">✅</div>
+          액션 아이템
+        </div>
+        <table class="action-table">
+          <thead>
+            <tr>
+              <th style="width:100px">담당자</th>
+              <th>할 일</th>
+              <th style="width:110px">기한</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="assignee-chip">👤 김대리</span></td>
+              <td class="action-text">3월 프로모션 기획안 초안 작성 → 차주 회의(3/17)에서 전체 검토 예정</td>
+              <td><span class="due-chip due-urgent">3월 12일 (수)</span></td>
+            </tr>
+            <tr>
+              <td><span class="assignee-chip">👤 이과장</span></td>
+              <td class="action-text">인플루언서 미팅 일정 조율 및 확정 (푸드스타일리 김OO)</td>
+              <td><span class="due-chip due-urgent">3월 14일 (금)</span></td>
+            </tr>
+            <tr>
+              <td><span class="assignee-chip">👤 박사원</span></td>
+              <td class="action-text">B안(영상형) 기반 영상 광고 3개 추가 제작</td>
+              <td><span class="due-chip due-urgent">3월 14일 (금)</span></td>
+            </tr>
+            <tr>
+              <td><span class="assignee-chip">👤 박사원</span></td>
+              <td class="action-text">경쟁사 C사 신규 캠페인 분석 및 결과 공유</td>
+              <td><span class="due-chip due-normal">3월 16일 (일)</span></td>
+            </tr>
+            <tr>
+              <td><span class="assignee-chip">👤 정팀장</span></td>
+              <td class="action-text">영상 광고 제작비 추가 200만원 예산 조정 요청 준비</td>
+              <td><span class="due-chip due-normal">3월 17일 前</span></td>
+            </tr>
+            <tr>
+              <td><span class="assignee-chip">👥 전체</span></td>
+              <td class="action-text">다음 주간회의 참석 및 3월 프로모션 기획안 사전 검토</td>
+              <td><span class="due-chip due-next">3월 17일 (월) 10:00</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- ── 푸터 ── -->
+    <div class="page-footer">
+      <span class="footer-note">본 문서는 김비서 AI가 회의록을 바탕으로 자동 생성하였습니다.</span>
+      <span class="footer-next">📅 다음 회의 : 3월 17일 (월) 오전 10시</span>
+    </div>
+
+  </div>
+
+  <script>
+    (function() {
+      const page = location.pathname.split('/').pop().replace(/\.[^.]+$/, '') || 'dashboard';
+      document.querySelectorAll('.site-nav-tab').forEach(a => {
+        if (a.dataset.page === page) a.classList.add('active');
+      });
+    })();
+  </script>
+</body>
+</html>

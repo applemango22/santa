@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>김비서 매출 차트</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', -apple-system, sans-serif;
+      background: #F0F9FF;
+      color: #1E293B;
+      min-height: 100vh;
+      padding: 64px 24px 60px;
+    }
+
+    .page { max-width: 1120px; margin: 0 auto; }
+
+    /* ── 페이지 헤더 ── */
+    .pg-header { margin-bottom: 28px; }
+
+    .pg-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #DBEAFE; color: #1D4ED8;
+      font-size: 11px; font-weight: 700; letter-spacing: 1px;
+      padding: 5px 13px; border-radius: 100px; text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .pg-title { font-size: 1.75rem; font-weight: 800; color: #0F172A; letter-spacing: -.4px; }
+    .pg-sub   { font-size: .875rem; color: #64748B; margin-top: 5px; }
+
+    /* ── 지표 카드 ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .stat {
+      background: #fff;
+      border-radius: 14px; padding: 18px 20px;
+      border: 1px solid #E0F2FE;
+      box-shadow: 0 1px 3px rgba(0,0,0,.05), 0 4px 14px rgba(0,0,0,.04);
+    }
+
+    .stat-lbl { font-size: .7rem; font-weight: 700; letter-spacing: .5px; color: #64748B; margin-bottom: 7px; text-transform: uppercase; }
+    .stat-val { font-size: 1.3rem; font-weight: 800; letter-spacing: -.4px; }
+    .stat-sub { font-size: .7rem; color: #94A3B8; margin-top: 4px; }
+
+    .s-blue  .stat-val { color: #1D4ED8; }
+    .s-sky   .stat-val { color: #0369A1; }
+    .s-teal  .stat-val { color: #0F766E; }
+    .s-green .stat-val { color: #15803D; }
+
+    /* ── 차트 그리드 ── */
+    .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    .chart-card {
+      background: #fff;
+      border-radius: 16px; padding: 24px 24px 20px;
+      border: 1px solid #E0F2FE;
+      box-shadow: 0 1px 3px rgba(0,0,0,.05), 0 6px 20px rgba(0,0,0,.05);
+    }
+
+    .chart-label { font-size: .94rem; font-weight: 700; color: #0F172A; }
+    .chart-desc  { font-size: .73rem; color: #94A3B8; margin-top: 3px; margin-bottom: 18px; }
+
+    canvas { display: block; width: 100%; }
+
+    /* ── 툴팁 ── */
+    #tip {
+      position: fixed; z-index: 9999; pointer-events: none; display: none;
+      background: #1E293B; color: #fff;
+      border-radius: 10px; padding: 10px 14px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.22);
+    }
+    #tip-d { font-size: .7rem; color: #94A3B8; margin-bottom: 3px; }
+    #tip-v { font-size: .92rem; font-weight: 800; color: #60A5FA; }
+
+    /* ── 범례 ── */
+    .legend {
+      display: flex; align-items: center; gap: 16px;
+      margin-top: 12px; font-size: .73rem; color: #64748B;
+    }
+    .legend-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      display: inline-block; margin-right: 5px;
+    }
+
+    /* ── 반응형 ── */
+    @media (max-width: 820px) {
+      .stats  { grid-template-columns: repeat(2, 1fr); }
+      .charts { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      body   { padding: 24px 16px 48px; }
+    }
+    /* ── 공통 네비게이션 ── */
+    .site-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      height: 46px; background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid #E2E8F0;
+      display: flex; align-items: center; gap: 3px;
+      padding: 0 24px; overflow-x: auto; scrollbar-width: none;
+    }
+    .site-nav::-webkit-scrollbar { display: none; }
+    .site-nav-tab {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 13px; border-radius: 8px; text-decoration: none;
+      font-size: .8rem; font-weight: 600; color: #64748B;
+      border: 1px solid transparent; white-space: nowrap; transition: all .18s;
+    }
+    .site-nav-tab:hover { background: #F1F5F9; color: #1E293B; border-color: #E2E8F0; }
+    .site-nav-tab.active { background: #EEF2FF; color: #4F46E5; border-color: #C7D2FE; }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="dashboard.html"      class="site-nav-tab" data-page="dashboard">📊 대시보드</a>
+    <a href="meeting-result.html" class="site-nav-tab" data-page="meeting-result">📝 회의록</a>
+    <a href="chart.html"          class="site-nav-tab" data-page="chart">📈 매출 현황</a>
+    <a href="diagram.html"        class="site-nav-tab" data-page="diagram">🔄 업무 프로세스</a>
+    <a href="report.html"         class="site-nav-tab" data-page="report">🔍 사이트 분석</a>
+  </nav>
+<div class="page">
+
+  <!-- 헤더 -->
+  <div class="pg-header">
+    <div class="pg-badge">📊 Sales Analytics</div>
+    <div class="pg-title">매출 데이터 분석</div>
+    <div class="pg-sub">소스: 김비서-데이터/매출데이터.csv &nbsp;·&nbsp; 기간: 2026년 1월 ~ 2월</div>
+  </div>
+
+  <!-- 지표 카드 -->
+  <div class="stats">
+    <div class="stat s-blue">
+      <div class="stat-lbl">총 누적 매출</div>
+      <div class="stat-val">7,101만원</div>
+      <div class="stat-sub">1~2월 합계</div>
+    </div>
+    <div class="stat s-sky">
+      <div class="stat-lbl">1월 매출</div>
+      <div class="stat-val">4,650만원</div>
+      <div class="stat-sub">7개 영업일 기준</div>
+    </div>
+    <div class="stat s-teal">
+      <div class="stat-lbl">2월 매출 (집계중)</div>
+      <div class="stat-val">2,451만원</div>
+      <div class="stat-sub">3개 영업일 기준</div>
+    </div>
+    <div class="stat s-green">
+      <div class="stat-lbl">베스트 상품</div>
+      <div class="stat-val">무선 이어폰</div>
+      <div class="stat-sub">2,884만원 · 6회 판매</div>
+    </div>
+  </div>
+
+  <!-- 차트 -->
+  <div class="charts">
+
+    <div class="chart-card">
+      <div class="chart-label">날짜별 매출 추이</div>
+      <div class="chart-desc">영업일 기준 일별 매출 합계 · 단위: 만원</div>
+      <canvas id="lineChart" style="height:248px"></canvas>
+      <div class="legend">
+        <span><span class="legend-dot" style="background:#2563EB"></span>일별 매출</span>
+        <span style="color:#CBD5E1">│</span>
+        <span style="color:#CBD5E1">점선: 월 구분</span>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-label">제품별 매출 비교</div>
+      <div class="chart-desc">전체 기간 누적 매출 · 단위: 만원</div>
+      <canvas id="barChart" style="height:248px"></canvas>
+    </div>
+
+  </div>
+</div>
+
+<!-- 툴팁 -->
+<div id="tip">
+  <div id="tip-d"></div>
+  <div id="tip-v"></div>
+</div>
+
+<script>
+/* ── 데이터 ─────────────────────────────────────────── */
+const dateRows = [
+  { label:'1/5',  month:'1월', value:7075000  },
+  { label:'1/8',  month:'1월', value:8413000  },
+  { label:'1/12', month:'1월', value:4135000  },
+  { label:'1/15', month:'1월', value:8122000  },
+  { label:'1/19', month:'1월', value:5060000  },
+  { label:'1/22', month:'1월', value:9029000  },
+  { label:'1/26', month:'1월', value:4665000  },
+  { label:'2/1',  month:'2월', value:10110000 },
+  { label:'2/5',  month:'2월', value:6195000  },
+  { label:'2/10', month:'2월', value:8202000  },
+];
+
+const prodRows = [
+  { name:'무선 이어폰',     value:28836000 },
+  { name:'텀블러',         value:11525000 },
+  { name:'블루투스 스피커', value:9600000  },
+  { name:'보조배터리',      value:9030000  },
+  { name:'에코백',         value:6165000  },
+  { name:'무선 충전기',     value:5850000  },
+];
+
+/* ── 포맷 헬퍼 ─────────────────────────────────────── */
+function fmtMan(n)  { return Math.round(n/10000).toLocaleString('ko-KR') + '만'; }
+function fmtFull(n) { return n.toLocaleString('ko-KR') + '원'; }
+
+/* ── 둥근 직사각형 경로 ──────────────────────────────── */
+function rRect(ctx, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y,     x + w, y + r,     r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x,     y + h, x,     y + h - r, r);
+  ctx.lineTo(x,     y + r);
+  ctx.arcTo(x,     y,     x + r, y,         r);
+  ctx.closePath();
+}
+
+/* ── 선 그래프 ─────────────────────────────────────── */
+function drawLine() {
+  const canvas = document.getElementById('lineChart');
+  const dpr    = window.devicePixelRatio || 1;
+  const rect   = canvas.getBoundingClientRect();
+  const W = rect.width, H = rect.height;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const pad = { top:28, right:18, bottom:46, left:64 };
+  const cW  = W - pad.left - pad.right;
+  const cH  = H - pad.top  - pad.bottom;
+
+  const MAX_Y  = 12000000;
+  const Y_STEPS = [0, 3000000, 6000000, 9000000, 12000000];
+
+  const xOf = i => pad.left + (i / (dateRows.length - 1)) * cW;
+  const yOf = v => pad.top  + cH - (v / MAX_Y) * cH;
+
+  /* 그리드 */
+  Y_STEPS.forEach(v => {
+    const y = yOf(v);
+    ctx.strokeStyle = '#EFF6FF';
+    ctx.lineWidth   = 1;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + cW, y); ctx.stroke();
+
+    ctx.fillStyle = '#94A3B8';
+    ctx.font = "11px 'Apple SD Gothic Neo',sans-serif";
+    ctx.textAlign = 'right';
+    ctx.fillText(v === 0 ? '0' : fmtMan(v), pad.left - 8, y + 4);
+  });
+
+  /* 월 구분선 */
+  const divX = (xOf(6) + xOf(7)) / 2;
+  ctx.strokeStyle = '#BFDBFE';
+  ctx.lineWidth   = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(divX, pad.top); ctx.lineTo(divX, pad.top + cH); ctx.stroke();
+  ctx.setLineDash([]);
+
+  /* 월 레이블 */
+  ctx.fillStyle = '#93C5FD';
+  ctx.font = "bold 10px 'Apple SD Gothic Neo',sans-serif";
+  ctx.textAlign = 'center';
+  ctx.fillText('1월', (pad.left + divX) / 2, pad.top - 10);
+  ctx.fillText('2월', (divX + pad.left + cW) / 2, pad.top - 10);
+
+  /* X 레이블 */
+  dateRows.forEach((d, i) => {
+    ctx.fillStyle  = '#94A3B8';
+    ctx.font       = "11px 'Apple SD Gothic Neo',sans-serif";
+    ctx.textAlign  = 'center';
+    ctx.fillText(d.label, xOf(i), H - 6);
+  });
+
+  /* 영역 채우기 (그라디언트) */
+  const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + cH);
+  grad.addColorStop(0, 'rgba(37,99,235,0.2)');
+  grad.addColorStop(1, 'rgba(37,99,235,0)');
+
+  ctx.beginPath();
+  ctx.moveTo(xOf(0), yOf(dateRows[0].value));
+  for (let i = 1; i < dateRows.length; i++) {
+    const cpX = (xOf(i-1) + xOf(i)) / 2;
+    ctx.bezierCurveTo(cpX, yOf(dateRows[i-1].value), cpX, yOf(dateRows[i].value), xOf(i), yOf(dateRows[i].value));
+  }
+  ctx.lineTo(xOf(dateRows.length - 1), pad.top + cH);
+  ctx.lineTo(xOf(0), pad.top + cH);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  /* 라인 */
+  ctx.beginPath();
+  ctx.moveTo(xOf(0), yOf(dateRows[0].value));
+  for (let i = 1; i < dateRows.length; i++) {
+    const cpX = (xOf(i-1) + xOf(i)) / 2;
+    ctx.bezierCurveTo(cpX, yOf(dateRows[i-1].value), cpX, yOf(dateRows[i].value), xOf(i), yOf(dateRows[i].value));
+  }
+  ctx.strokeStyle = '#2563EB';
+  ctx.lineWidth   = 2.5;
+  ctx.lineJoin    = 'round';
+  ctx.stroke();
+
+  /* 데이터 포인트 */
+  dateRows.forEach((d, i) => {
+    const x = xOf(i), y = yOf(d.value);
+    /* 바깥 원 (흰색) */
+    ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI*2);
+    ctx.fillStyle = '#fff'; ctx.fill();
+    ctx.strokeStyle = '#2563EB'; ctx.lineWidth = 2; ctx.stroke();
+    /* 안쪽 원 (파란색) */
+    ctx.beginPath(); ctx.arc(x, y, 2.5, 0, Math.PI*2);
+    ctx.fillStyle = '#2563EB'; ctx.fill();
+  });
+}
+
+/* ── 막대 그래프 ────────────────────────────────────── */
+function drawBar() {
+  const canvas = document.getElementById('barChart');
+  const dpr    = window.devicePixelRatio || 1;
+  const rect   = canvas.getBoundingClientRect();
+  const W = rect.width, H = rect.height;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const pad = { top:8, right:74, bottom:8, left:102 };
+  const cW  = W - pad.left - pad.right;
+  const cH  = H - pad.top  - pad.bottom;
+
+  const MAX_X  = 30000000;
+  const n      = prodRows.length;
+  const barH   = Math.min(28, (cH / n) * 0.55);
+  const rowH   = cH / n;
+
+  prodRows.forEach((d, i) => {
+    const y    = pad.top + i * rowH + (rowH - barH) / 2;
+    const barW = (d.value / MAX_X) * cW;
+
+    /* 트랙 배경 */
+    rRect(ctx, pad.left, y, cW, barH, barH / 2);
+    ctx.fillStyle = '#F0FDF4'; ctx.fill();
+
+    /* 바 (그라디언트) */
+    if (barW > barH) {
+      const grad = ctx.createLinearGradient(pad.left, 0, pad.left + barW, 0);
+      grad.addColorStop(0, '#0D9488');
+      grad.addColorStop(1, '#22C55E');
+      rRect(ctx, pad.left, y, barW, barH, barH / 2);
+      ctx.fillStyle = grad; ctx.fill();
+    }
+
+    /* 제품명 (좌측) */
+    ctx.fillStyle = '#334155';
+    ctx.font      = "600 12px 'Apple SD Gothic Neo',sans-serif";
+    ctx.textAlign = 'right';
+    ctx.fillText(d.name, pad.left - 10, y + barH / 2 + 4.5);
+
+    /* 값 레이블 (우측) */
+    ctx.fillStyle = '#0D9488';
+    ctx.font      = "700 12px 'Apple SD Gothic Neo',sans-serif";
+    ctx.textAlign = 'left';
+    ctx.fillText(fmtMan(d.value) + '원', pad.left + barW + 9, y + barH / 2 + 4.5);
+
+    /* 최고 상품 강조 배지 */
+    if (i === 0) {
+      const tx = pad.left + barW + 9;
+      const valStr = fmtMan(d.value) + '원';
+      ctx.font = "700 12px 'Apple SD Gothic Neo',sans-serif";
+      const tw = ctx.measureText(valStr).width;
+      const bx = tx + tw + 6, by = y + 2, bw = 24, bh = barH - 4;
+      rRect(ctx, bx, by, bw, bh, 5);
+      ctx.fillStyle = '#FEF08A'; ctx.fill();
+      ctx.fillStyle = '#854D0E';
+      ctx.font = "bold 9px 'Apple SD Gothic Neo',sans-serif";
+      ctx.textAlign = 'center';
+      ctx.fillText('1위', bx + bw/2, by + bh/2 + 3.5);
+    }
+  });
+}
+
+/* ── 툴팁 ────────────────────────────────────────────── */
+const tip   = document.getElementById('tip');
+const tipD  = document.getElementById('tip-d');
+const tipV  = document.getElementById('tip-v');
+
+document.getElementById('lineChart').addEventListener('mousemove', function(e) {
+  const rect  = this.getBoundingClientRect();
+  const mx    = e.clientX - rect.left;
+  const W     = rect.width;
+  const pad   = { left:64, right:18 };
+  const cW    = W - pad.left - pad.right;
+  const xOf   = i => pad.left + (i / (dateRows.length - 1)) * cW;
+
+  let closest = 0, minDist = Infinity;
+  dateRows.forEach((_, i) => {
+    const dx = Math.abs(mx - xOf(i));
+    if (dx < minDist) { minDist = dx; closest = i; }
+  });
+
+  if (minDist < 40) {
+    tipD.textContent = '2026년 ' + dateRows[closest].label + ' (' + dateRows[closest].month + ')';
+    tipV.textContent = fmtFull(dateRows[closest].value);
+    tip.style.display = 'block';
+    /* 화면 우측 넘침 방지 */
+    const tx = e.clientX + 14;
+    tip.style.left = (tx + 160 > window.innerWidth ? e.clientX - 160 : tx) + 'px';
+    tip.style.top  = (e.clientY - 46) + 'px';
+  } else {
+    tip.style.display = 'none';
+  }
+});
+
+document.getElementById('lineChart').addEventListener('mouseleave', () => {
+  tip.style.display = 'none';
+});
+
+/* ── 초기화 & 리사이즈 ────────────────────────────────── */
+function render() { drawLine(); drawBar(); }
+
+(function() {
+  const page = location.pathname.split('/').pop().replace(/\.[^.]+$/, '') || 'dashboard';
+  document.querySelectorAll('.site-nav-tab').forEach(a => {
+    if (a.dataset.page === page) a.classList.add('active');
+  });
+})();
+
+window.addEventListener('load', render);
+window.addEventListener('resize', () => {
+  clearTimeout(window._rt);
+  window._rt = setTimeout(render, 150);
+});
+</script>
+</body>
+</html>
